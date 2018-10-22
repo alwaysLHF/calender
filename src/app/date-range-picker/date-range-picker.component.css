@@ -62,8 +62,13 @@
     float: right;
 }
 
-.ui-datepicker-wrapper .ui-datepicker-body table {
+.ui-datepicker-wrapper .ui-datepicker-body .ui-datepicker-table {
     width: 41%;
+    border-collapse: collapse;
+}
+
+.ui-datepicker-wrapper .ui-datepicker-body .ui-datepicker-monthtable {
+    width: 47%;
     border-collapse: collapse;
 }
 
@@ -123,7 +128,7 @@
     color: white;
 }
 
-.ui-datepicker-table td:hover {
+td:hover {
     background: #1abc9c;
     color: white;
 }
@@ -156,4 +161,14 @@
 .active {
     background: #1abc9c;
     color: white;
+}
+
+.ui-datepicker-month-tableTwo {
+    /* margin-top: 7%; */
+    float: left;
+}
+
+.ui-datepicker-month-tableTwo {
+    /* margin-top: 7%; */
+    float: right;
 }

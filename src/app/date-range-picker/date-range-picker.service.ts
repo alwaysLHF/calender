@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SelectItem } from 'primeng/api';
-import { DateData, ShowDateData } from './date-range-picker';
+import { DateData, ShowDateData, MONTH } from './date-range-picker';
 import { element } from 'protractor';
 
 @Injectable({
@@ -8,29 +8,41 @@ import { element } from 'protractor';
 })
 export class DateRangePickerService {
 
-  private static YEARRANGE = 10;
+  private static YEARRANGE = 11;
   private today = new Date(); // 获取当日日期
+  maxDate = new Date(2038, 3, 15); // 日期选择范围的最大值
+  minDate = new Date(2000, 5, 21); // 日期选择范围的最小值
 
   constructor() { }
 
   /**
    * 获取日历年份选项
    */
-  getYearRange(yearNow: number): SelectItem[] {
+  getYearRange(): SelectItem[] {
 
     // tslint:disable-next-line:prefer-const
     let yearRange: SelectItem[] = [];
-    if ((0 < yearNow / 1000) && (yearNow / 1000) < 9) {
-      for (let i = yearNow - DateRangePickerService.YEARRANGE; i < yearNow + DateRangePickerService.YEARRANGE; i++) {
+
+    if (this.maxDate > this.minDate) {
+      for (let i = this.minDate.getFullYear(); i <= this.maxDate.getFullYear(); i++) {
         yearRange.push({ label: i.toString(), value: i });
       }
       return yearRange;
     } else {
-      yearRange.push(
-        { label: this.today.getFullYear().toString(), value: this.today.getFullYear() }
-      );
-      return yearRange;
+      const yearNow = new Date().getFullYear();
+      if ((0 < yearNow / 1000) && (yearNow / 1000) < 9) {
+        for (let i = yearNow - DateRangePickerService.YEARRANGE; i < yearNow + DateRangePickerService.YEARRANGE; i++) {
+          yearRange.push({ label: i.toString(), value: i });
+        }
+        return yearRange;
+      } else {
+        yearRange.push(
+          { label: this.today.getFullYear().toString(), value: this.today.getFullYear() }
+        );
+        return yearRange;
+      }
     }
+
   }
 
   /**
@@ -87,20 +99,22 @@ export class DateRangePickerService {
     }
 
 
-    return this.turnToShowTableData(dateArray, month);
+    return this.turnToShowTableData(dateArray, month, dateNow);
   }
 
   /**
    * 将数据进行分行分列
    */
-  turnToShowTableData(dateData: DateData[], month): ShowDateData[] {
+  turnToShowTableData(dateData: DateData[], month, dateNow: Date): ShowDateData[] {
     // tslint:disable-next-line:prefer-const
     let showDataArray = [];
     let minShowDataArray: ShowDateData[] = [];
 
     for (let i = 0; i < dateData.length; i++) {
+      // tslint:disable-next-line:prefer-const
       let d = new ShowDateData();
-      if (dateData[i].month !== month) {
+      const today = new Date(dateNow.getFullYear(), dateData[i].month, dateData[i].showDate);
+      if (dateData[i].month !== month || today > this.maxDate || today < this.minDate) {
         d.disable = false;
       } else {
         d.disable = true;
@@ -120,9 +134,36 @@ export class DateRangePickerService {
   }
 
   /**
-   * 获取每一行的每列数据
+   * 获取日期选择范围
    */
-  getRowDateData() {
+  getYEARRANGE() {
+    return DateRangePickerService.YEARRANGE;
+  }
 
+  /**
+   * 获取用户输入的最大最小值
+   */
+  setDateRangeInput(maxDate: Date, minDate: Date) {
+    this.maxDate = maxDate;
+    this.minDate = minDate;
+    return;
+  }
+
+  getMonthTableData() {
+    // tslint:disable-next-line:prefer-const
+    let monthArray = [];
+    // tslint:disable-next-line:prefer-const
+    let tempArray = [];
+    for (let i = 0; i < MONTH.length; i++) {
+      if (i % 4 === 3) {
+        tempArray.push(MONTH[i]);
+        monthArray.push(tempArray);
+        tempArray = [];
+      } else {
+        tempArray.push(MONTH[i]);
+      }
+    }
+
+    return monthArray;
   }
 }

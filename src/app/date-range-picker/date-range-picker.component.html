@@ -1,61 +1,79 @@
 <input type="text" class="datepicker" [(ngModel)]="dateRangeShow" readonly/>
 <div class="ui-datepicker-wrapper">
     <div class="ui-datepicker-range">
-        <button class="ui-datepicker-btn-range">日</button>
-        <button class="ui-datepicker-btn-range">月</button>
+        <button class="ui-datepicker-btn-range" (click)='rangeChoose("day")'>日</button>
+        <button class="ui-datepicker-btn-range" (click)='rangeChoose("month")'>月</button>
         <button class="ui-datepicker-btn-range">季</button>
         <button class="ui-datepicker-btn-range">年</button>
     </div>
     <div class="ui-datepicker-date">
         <div class="ui-datepicker-datepicker">
-            <label for="YEAR">年</label>
-            <p-dropdown [options]="YEAR" [(ngModel)]="yearPicker" id="YEAR" (onClick)='getYearPicker()'></p-dropdown>
-            <label style="margin-left: 12px;" for="MONTH">月</label>
-            <p-dropdown [options]="MONTH" [(ngModel)]="monthPicker" id="MONTH" (onClick)='getMonthPicker()'></p-dropdown>
+            <label for="YEAR" *ngIf="isYearPickerShow">年</label>
+            <p-dropdown *ngIf="isYearPickerShow" [options]="YEAR" [(ngModel)]="yearPicker" id="YEAR" (onClick)='getYearPicker()'></p-dropdown>
+            <label *ngIf="isMonthPickerShow" style="margin-left: 12px;" for="MONTH">月</label>
+            <p-dropdown *ngIf="isMonthPickerShow" [options]="MONTH" [(ngModel)]="monthPicker" id="MONTH" (onClick)='getMonthPicker()'></p-dropdown>
         </div>
         <div class="ui-datepicker-header">
             <a class="ui-datepicker-btn ui-datepicker-prev-btn" href="#" (click)='getPrevDate()'>&lt;</a>
             <a class="ui-datepicker-btn ui-datepicker-next-btn" href="#" (click)='getNextDate()'>&gt;</a>
-            <span class="ui-datepicker-month-one">{{dateNow.getFullYear()}}/{{dateNow.getMonth() + 1}}</span>
-            <span class="ui-datepicker-month-two">{{dateNext.getFullYear()}}/{{dateNext.getMonth() + 1}}</span>
+            <span class="ui-datepicker-month-one">{{dateNow.getFullYear()}}<span *ngIf="isMonthShow">/{{dateNow.getMonth() + 1}}</span></span>
+            <span class="ui-datepicker-month-two">{{dateNext.getFullYear()}}<span *ngIf="isMonthShow">/{{dateNext.getMonth() + 1}}</span></span>
         </div>
         <div class="ui-datepicker-body">
-            <table class="ui-datepicker-table ui-datepicker-tableone">
-                <thead>
-                    <tr>
-                        <th>一</th>
-                        <th>二</th>
-                        <th>三</th>
-                        <th>四</th>
-                        <th>五</th>
-                        <th>六</th>
-                        <th>日</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let row of showtableDataOne">
-                        <td [class.disable]='!col.disable' [class.active]='active' *ngFor="let col of row" (click)="selectDate1(col)" disabled>{{col.showDate}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="ui-datepicker-table ui-datepicker-tableTwo">
-                <thead>
-                    <tr>
-                        <th>一</th>
-                        <th>二</th>
-                        <th>三</th>
-                        <th>四</th>
-                        <th>五</th>
-                        <th>六</th>
-                        <th>日</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let row of showtableDataTwo">
-                        <td [class.disable]='!col.disable' [class.active]='active' *ngFor="let col of row" (click)="selectDate2(col)">{{col.showDate}}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div *ngIf="isDayTableShow">
+                <table class="ui-datepicker-table ui-datepicker-tableone">
+                    <thead>
+                        <tr>
+                            <th>一</th>
+                            <th>二</th>
+                            <th>三</th>
+                            <th>四</th>
+                            <th>五</th>
+                            <th>六</th>
+                            <th>日</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of showtableDataOne">
+                            <td [class.disable]='!col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate1(col)">{{col.showDate}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="ui-datepicker-table ui-datepicker-tableTwo">
+                    <thead>
+                        <tr>
+                            <th>一</th>
+                            <th>二</th>
+                            <th>三</th>
+                            <th>四</th>
+                            <th>五</th>
+                            <th>六</th>
+                            <th>日</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of showtableDataTwo">
+                            <td [class.disable]='!col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate2(col)">{{col.showDate}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="isMonthTableShow">
+                <table class="ui-datepicker-monthtable ui-datepicker-month-tableOne">
+                    <tbody>
+                        <tr *ngFor="let row of MonthTableDataOne">
+                            <td *ngFor="let col of row" (click)="selectDate2(col)">{{col.label}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="ui-datepicker-monthtable ui-datepicker-month-tableTwo">
+                    <tbody>
+                        <tr *ngFor="let row of MonthTableDataTwo">
+                            <td *ngFor="let col of row" (click)="selectDate2(col)">{{col.label}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
