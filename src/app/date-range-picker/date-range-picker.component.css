@@ -163,12 +163,12 @@ td:hover {
     color: white;
 }
 
-.ui-datepicker-month-tableTwo {
-    /* margin-top: 7%; */
+.ui-datepicker-month-tableOne {
+    margin-top: 7%;
     float: left;
 }
 
 .ui-datepicker-month-tableTwo {
-    /* margin-top: 7%; */
+    margin-top: 7%;
     float: right;
 }

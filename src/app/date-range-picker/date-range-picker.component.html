@@ -2,8 +2,8 @@
 <div class="ui-datepicker-wrapper">
     <div class="ui-datepicker-range">
         <button class="ui-datepicker-btn-range" (click)='rangeChoose("day")'>日</button>
+        <button class="ui-datepicker-btn-range" (click)='rangeChoose("week")'>周</button>
         <button class="ui-datepicker-btn-range" (click)='rangeChoose("month")'>月</button>
-        <button class="ui-datepicker-btn-range">季</button>
         <button class="ui-datepicker-btn-range">年</button>
     </div>
     <div class="ui-datepicker-date">
@@ -35,7 +35,7 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let row of showtableDataOne">
-                            <td [class.disable]='!col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate1(col)">{{col.showDate}}</td>
+                            <td [class.disable]='col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate1(col)">{{col.showDate}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -53,7 +53,7 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let row of showtableDataTwo">
-                            <td [class.disable]='!col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate2(col)">{{col.showDate}}</td>
+                            <td [class.disable]='col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate2(col)">{{col.showDate}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -62,14 +62,30 @@
                 <table class="ui-datepicker-monthtable ui-datepicker-month-tableOne">
                     <tbody>
                         <tr *ngFor="let row of MonthTableDataOne">
-                            <td *ngFor="let col of row" (click)="selectDate2(col)">{{col.label}}</td>
+                            <td [class.disable]='col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate1(col)">{{col.label}}</td>
                         </tr>
                     </tbody>
                 </table>
                 <table class="ui-datepicker-monthtable ui-datepicker-month-tableTwo">
                     <tbody>
                         <tr *ngFor="let row of MonthTableDataTwo">
-                            <td *ngFor="let col of row" (click)="selectDate2(col)">{{col.label}}</td>
+                            <td [class.disable]='col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate2(col)">{{col.label}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="isWeekTableShow">
+                <table class="ui-datepicker-weektable ui-datepicker-week-tableOne">
+                    <tbody>
+                        <tr *ngFor="let row of WeekTableDataOne">
+                            <td [class.disable]='col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate1(col)">{{col.label}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="ui-datepicker-weektable ui-datepicker-week-tableTwo">
+                    <tbody>
+                        <tr *ngFor="let row of WeekTableDataTwo">
+                            <td [class.disable]='col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate2(col)">{{col.label}}</td>
                         </tr>
                     </tbody>
                 </table>

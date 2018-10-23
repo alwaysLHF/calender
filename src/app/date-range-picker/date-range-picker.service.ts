@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SelectItem } from 'primeng/api';
 import { DateData, ShowDateData, MONTH } from './date-range-picker';
-import { element } from 'protractor';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +9,8 @@ export class DateRangePickerService {
 
   private static YEARRANGE = 11;
   private today = new Date(); // 获取当日日期
-  maxDate = new Date(2038, 3, 15); // 日期选择范围的最大值
-  minDate = new Date(2000, 5, 21); // 日期选择范围的最小值
+  maxDate = new Date(); // 日期选择范围的最大值
+  minDate = new Date(); // 日期选择范围的最小值
 
   constructor() { }
 
@@ -115,9 +114,9 @@ export class DateRangePickerService {
       let d = new ShowDateData();
       const today = new Date(dateNow.getFullYear(), dateData[i].month, dateData[i].showDate);
       if (dateData[i].month !== month || today > this.maxDate || today < this.minDate) {
-        d.disable = false;
-      } else {
         d.disable = true;
+      } else {
+        d.disable = false;
       }
       d.month = dateData[i].month;
       d.showDate = dateData[i].showDate;
@@ -149,18 +148,34 @@ export class DateRangePickerService {
     return;
   }
 
-  getMonthTableData() {
+  /**
+   * 获取为月时日期表格数据
+   */
+  getMonthTableData(dateNow: Date) {
+    // tslint:disable-next-line:prefer-const
+    let M = new Date(dateNow.getFullYear(), 0, 1);
     // tslint:disable-next-line:prefer-const
     let monthArray = [];
     // tslint:disable-next-line:prefer-const
     let tempArray = [];
     for (let i = 0; i < MONTH.length; i++) {
+      // tslint:disable-next-line:prefer-const
+      let m = {
+        label: MONTH[i].label,
+        value: MONTH[i].value,
+        active: false,
+        disable: false
+      };
+      M.setMonth(i);
+      if (M > this.maxDate || M < this.minDate) {
+        m.disable = true;
+      }
       if (i % 4 === 3) {
-        tempArray.push(MONTH[i]);
+        tempArray.push(m);
         monthArray.push(tempArray);
         tempArray = [];
       } else {
-        tempArray.push(MONTH[i]);
+        tempArray.push(m);
       }
     }
 

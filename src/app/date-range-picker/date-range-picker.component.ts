@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { MONTH, ShowDateData } from './date-range-picker';
 import { DateRangePickerService } from './date-range-picker.service';
 import { SelectItem } from 'primeng/api';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-date-range-picker',
@@ -10,8 +11,8 @@ import { SelectItem } from 'primeng/api';
 })
 export class DateRangePickerComponent implements OnInit {
 
-  @Input() maxDate = new Date(2038, 1, 1); // 日期选择范围的最大值
-  @Input() minDate = new Date(2000, 1, 1); // 日期选择范围的最小值
+  @Input() maxDate = new Date(2038, 3, 15); // 日期选择范围的最大值
+  @Input() minDate = new Date(2000, 5, 21); // 日期选择范围的最小值
 
   today: Date = new Date(); // 获取当日日期
   dateNow: Date = this.today; // 界面显示的日期
@@ -40,7 +41,6 @@ export class DateRangePickerComponent implements OnInit {
 
   ngOnInit() {
     this.updateTableData();
-    console.log(this.service.getMonthTableData())
   }
 
   /**
@@ -48,7 +48,14 @@ export class DateRangePickerComponent implements OnInit {
    */
   getYearPicker() {
     this.dateNow.setFullYear(this.yearPicker);
-    this.updateTableData();
+    switch (this.choose) {
+      case 'day':
+        this.updateTableData();
+        break;
+      case 'month':
+        this.updateMonthTableData();
+        break;
+    }
   }
 
   /**
@@ -70,13 +77,16 @@ export class DateRangePickerComponent implements OnInit {
           this.yearPicker = this.dateNow.getFullYear();
           this.monthPicker = this.dateNow.getMonth() + 1;
           this.updateTableData();
+          this.setDateActive();
         }
         break;
       case 'month':
-        if (this.dateNow.getFullYear() >= this.YEAR[0].value) {
+        if (this.dateNow.getFullYear() > this.YEAR[0].value) {
           this.dateNow.setFullYear(this.dateNow.getFullYear() - 1);
           this.yearPicker = this.dateNow.getFullYear();
           this.monthPicker = this.dateNow.getMonth() + 1;
+          this.updateMonthTableData();
+          this.setMonthDateActive();
         }
     }
   }
@@ -92,19 +102,33 @@ export class DateRangePickerComponent implements OnInit {
           this.yearPicker = this.dateNow.getFullYear();
           this.monthPicker = this.dateNow.getMonth() + 1;
           this.updateTableData();
+          this.setDateActive();
         }
         break;
       case 'month':
-        if (this.dateNext.getFullYear() <= this.YEAR[this.YEAR.length - 1].value) {
+        if (this.dateNext.getFullYear() < this.YEAR[this.YEAR.length - 1].value) {
           this.dateNow.setFullYear(this.dateNow.getFullYear() + 1);
           this.yearPicker = this.dateNow.getFullYear();
           this.monthPicker = this.dateNow.getMonth() + 1;
+          this.updateMonthTableData();
+          this.setMonthDateActive();
         }
     }
   }
 
   /**
-   * 更新日期显示数据
+   * 更新选择为月日期显示数据
+   */
+  updateMonthTableData() {
+    // dateNext: Date = new Date(this.dateNow.getFullYear(), this.dateNow.getMonth() + 1);
+    this.dateNext = new Date(this.dateNow);
+    this.dateNext.setFullYear(this.dateNow.getFullYear() + 1);
+    this.MonthTableDataOne = this.service.getMonthTableData(this.dateNow);
+    this.MonthTableDataTwo = this.service.getMonthTableData(new Date(this.dateNext.getFullYear(), this.dateNext.getMonth()));
+  }
+
+  /**
+   * 更新选择为日日期显示数据
    */
   updateTableData() {
     // dateNext: Date = new Date(this.dateNow.getFullYear(), this.dateNow.getMonth() + 1);
@@ -119,21 +143,62 @@ export class DateRangePickerComponent implements OnInit {
    * @param event
    */
   selectDate1(event) {
-    if (event.disable === true) {
-      const selectedData = new Date(this.dateNow.getFullYear(), event.month - 1, event.showDate);
-      this.makesureDataRange(selectedData);
-      this.setDateActive();
-      if (this.dateRange.length !== 2) {
-        for (let i = 0; i < this.showtableDataOne.length; i++) {
-          for (let j = 0; j < 7; j++) {
-            if (this.showtableDataOne[i][j].disable === true) {
-              this.showtableDataOne[i][j].active = false;
-              if (this.showtableDataOne[i][j].showDate === event.showDate) {
-                this.showtableDataOne[i][j].active = true;
+    if (event.disable === false) {
+      switch (this.choose) {
+        case 'day':
+          const selectedData = new Date(this.dateNow.getFullYear(), event.month - 1, event.showDate);
+          this.makesureDataRange(selectedData);
+          this.setDateActive();
+          if (this.dateRange.length !== 2) {
+            for (let i = 0; i < this.showtableDataOne.length; i++) {
+              for (let j = 0; j < 7; j++) {
+                if (this.showtableDataOne[i][j].disable === false) {
+                  this.showtableDataOne[i][j].active = false;
+                  if (this.showtableDataOne[i][j].showDate === event.showDate) {
+                    this.showtableDataOne[i][j].active = true;
+                  }
+                }
               }
             }
           }
-        }
+          break;
+        case 'week':
+          const selectedWeekData = new Date(this.dateNow.getFullYear(), event.month - 1, event.showDate);
+          this.makesureDataRange(selectedWeekData);
+          this.setWeekDateActive();
+          if (this.dateRange.length === 1) {
+            for (let i = 0; i < this.showtableDataOne.length; i++) {
+              for (let j = 0; j < 7; j++) {
+                if (this.showtableDataOne[i][j].disable === false) {
+                  this.showtableDataOne[i][j].active = false;
+                  const date =
+                    moment({ y: this.dateNow.getFullYear(), M: this.dateNow.getMonth(), d: this.showtableDataOne[i][j].showDate });
+                  if (moment(this.dateRange[0]).isoWeek() === date.isoWeek()) {
+                    this.showtableDataOne[i][j].active = true;
+                  }
+                }
+              }
+            }
+          }
+          break;
+        case 'month':
+          const selectedMonthData = new Date(this.dateNow.getFullYear(), event.value - 1, 1);
+          this.makesureDataRange(selectedMonthData);
+          this.setMonthDateActive();
+          if (this.dateRange.length !== 2) {
+            for (let i = 0; i < this.MonthTableDataOne.length; i++) {
+              for (let j = 0; j < 4; j++) {
+                if (this.MonthTableDataOne[i][j].disable === false) {
+                  this.MonthTableDataOne[i][j].active = false;
+                  if (this.MonthTableDataOne[i][j].value === event.value) {
+                    this.MonthTableDataOne[i][j].active = true;
+                  }
+                }
+              }
+            }
+          }
+          break;
+
       }
     }
   }
@@ -143,21 +208,61 @@ export class DateRangePickerComponent implements OnInit {
    * @param event
    */
   selectDate2(event) {
-    if (event.disable === true) {
-      const selectedData = new Date(this.dateNext.getFullYear(), event.month - 1, event.showDate);
-      this.makesureDataRange(selectedData);
-      this.setDateActive();
-      if (this.dateRange.length !== 2) {
-        for (let i = 0; i < this.showtableDataTwo.length; i++) {
-          for (let j = 0; j < 7; j++) {
-            if (this.showtableDataTwo[i][j].disable === true) {
-              this.showtableDataTwo[i][j].active = false;
-              if (this.showtableDataTwo[i][j].showDate === event.showDate) {
-                this.showtableDataTwo[i][j].active = true;
+    if (event.disable === false) {
+      switch (this.choose) {
+        case 'day':
+          const selectedData = new Date(this.dateNext.getFullYear(), event.month - 1, event.showDate);
+          this.makesureDataRange(selectedData);
+          this.setDateActive();
+          if (this.dateRange.length !== 2) {
+            for (let i = 0; i < this.showtableDataTwo.length; i++) {
+              for (let j = 0; j < 7; j++) {
+                if (this.showtableDataTwo[i][j].disable === false) {
+                  this.showtableDataTwo[i][j].active = false;
+                  if (this.showtableDataTwo[i][j].showDate === event.showDate) {
+                    this.showtableDataTwo[i][j].active = true;
+                  }
+                }
               }
             }
           }
-        }
+          break;
+        case 'week':
+          const selectedWeekData = new Date(this.dateNext.getFullYear(), event.month - 1, event.showDate);
+          this.makesureDataRange(selectedWeekData);
+          this.setWeekDateActive();
+          if (this.dateRange.length === 1) {
+            for (let i = 0; i < this.showtableDataTwo.length; i++) {
+              for (let j = 0; j < 7; j++) {
+                if (this.showtableDataTwo[i][j].disable === false) {
+                  this.showtableDataTwo[i][j].active = false;
+                  const date =
+                    moment({ y: this.dateNext.getFullYear(), M: this.dateNext.getMonth(), d: this.showtableDataTwo[i][j].showDate });
+                  if (moment(this.dateRange[0]).isoWeek() === date.isoWeek()) {
+                    this.showtableDataTwo[i][j].active = true;
+                  }
+                }
+              }
+            }
+          }
+          break;
+        case 'month':
+          const selectedMonthData = new Date(this.dateNext.getFullYear(), event.value - 1, 1);
+          this.makesureDataRange(selectedMonthData);
+          this.setMonthDateActive();
+          if (this.dateRange.length !== 2) {
+            for (let i = 0; i < this.MonthTableDataTwo.length; i++) {
+              for (let j = 0; j < 4; j++) {
+                if (this.MonthTableDataTwo[i][j].disable === false) {
+                  this.MonthTableDataTwo[i][j].active = false;
+                  if (this.MonthTableDataTwo[i][j].value === event.value) {
+                    this.MonthTableDataTwo[i][j].active = true;
+                  }
+                }
+              }
+            }
+          }
+          break;
       }
     }
   }
@@ -186,30 +291,68 @@ export class DateRangePickerComponent implements OnInit {
       }
 
       this.dateRange.push(selectedData);
-      switch (this.dateRange.length) {
-        case 0: this.dateRangeShow = '';
+      switch (this.choose) {
+        case 'day': {
+          switch (this.dateRange.length) {
+            case 0: this.dateRangeShow = '';
+              break;
+            case 1: this.dateRangeShow = this.dateRange[0].getFullYear() + '/' +
+              ((this.dateRange[0].getMonth()) + 1) + '/' + this.dateRange[0].getDate();
+              break;
+            case 2:
+              this.dateRangeShow = this.dateRange[0].getFullYear() + '/' +
+                ((this.dateRange[0].getMonth()) + 1) + '/' + this.dateRange[0].getDate() + ' - ' + this.dateRange[1].getFullYear() + '/' +
+                ((this.dateRange[1].getMonth()) + 1) + '/' + this.dateRange[1].getDate();
+              break;
+            default:
+              this.dateRangeShow = '';
+          }
+        }
           break;
-        case 1: this.dateRangeShow = this.dateRange[0].getFullYear() + '/' +
-          ((this.dateRange[0].getMonth()) + 1) + '/' + this.dateRange[0].getDate();
+        case 'week': {
+          switch (this.dateRange.length) {
+            case 0: this.dateRangeShow = '';
+              break;
+            case 1: this.dateRangeShow = this.dateRange[0].getFullYear() + '/' + moment(this.dateRange[0]).isoWeek().toString();
+              break;
+            case 2:
+              this.dateRangeShow = this.dateRange[0].getFullYear() + '/' +
+                moment(this.dateRange[0]).isoWeek().toString() + ' - ' + this.dateRange[1].getFullYear() + '/' +
+                moment(this.dateRange[1]).isoWeek().toString();
+              break;
+            default:
+              this.dateRangeShow = '';
+          }
+        }
           break;
-        case 2:
-          this.dateRangeShow = this.dateRange[0].getFullYear() + '/' +
-            ((this.dateRange[0].getMonth()) + 1) + '/' + this.dateRange[0].getDate() + ' - ' + this.dateRange[1].getFullYear() + '/' +
-            ((this.dateRange[1].getMonth()) + 1) + '/' + this.dateRange[1].getDate();
-          break;
-        default:
-          this.dateRangeShow = '';
+        case 'month': {
+          switch (this.dateRange.length) {
+            case 0: this.dateRangeShow = '';
+              break;
+            case 1: this.dateRangeShow = this.dateRange[0].getFullYear() + '/' +
+              ((this.dateRange[0].getMonth()) + 1);
+              break;
+            case 2:
+              this.dateRangeShow = this.dateRange[0].getFullYear() + '/' +
+                ((this.dateRange[0].getMonth()) + 1) + '/' + ' - ' + this.dateRange[1].getFullYear() + '/' +
+                ((this.dateRange[1].getMonth()) + 1);
+              break;
+            default:
+              this.dateRangeShow = '';
+          }
+        }
+
       }
     }
   }
 
   /**
-   * 将选择的日期激活，让其显示为特定颜色
+   * 将选择的 日 日期激活，让其显示为特定颜色
    */
   setDateActive() {
     for (let i = 0; i < this.showtableDataOne.length; i++) {
       for (let j = 0; j < 7; j++) {
-        if (this.showtableDataOne[i][j].disable === true) {
+        if (this.showtableDataOne[i][j].disable === false) {
           this.showtableDataOne[i][j].active = false;
           if (this.dateRange.length === 2) {
             const date = new Date(this.dateNow.getFullYear(), this.dateNow.getMonth(), this.showtableDataOne[i][j].showDate);
@@ -222,11 +365,77 @@ export class DateRangePickerComponent implements OnInit {
     }
     for (let i = 0; i < this.showtableDataTwo.length; i++) {
       for (let j = 0; j < 7; j++) {
-        if (this.showtableDataTwo[i][j].disable === true) {
+        if (this.showtableDataTwo[i][j].disable === false) {
           this.showtableDataTwo[i][j].active = false;
           if (this.dateRange.length === 2) {
             const date = new Date(this.dateNext.getFullYear(), this.dateNext.getMonth(), this.showtableDataTwo[i][j].showDate);
             if (this.dateRange[0] <= date && this.dateRange[1] >= date) {
+              this.showtableDataTwo[i][j].active = true;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * 将选择的 月 日期激活，让其显示为特定颜色
+   */
+  setMonthDateActive() {
+    for (let i = 0; i < this.MonthTableDataOne.length; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (this.MonthTableDataOne[i][j].disable === false) {
+          this.MonthTableDataOne[i][j].active = false;
+          if (this.dateRange.length === 2) {
+            const date = new Date(this.dateNow.getFullYear(), this.MonthTableDataOne[i][j].value - 1, 1);
+            if (this.dateRange[0] <= date && this.dateRange[1] >= date) {
+              this.MonthTableDataOne[i][j].active = true;
+            }
+          }
+        }
+      }
+    }
+    for (let i = 0; i < this.MonthTableDataTwo.length; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (this.MonthTableDataTwo[i][j].disable === false) {
+          this.MonthTableDataTwo[i][j].active = false;
+          if (this.dateRange.length === 2) {
+            const date = new Date(this.dateNext.getFullYear(), this.MonthTableDataTwo[i][j].value - 1, 1);
+            if (this.dateRange[0] <= date && this.dateRange[1] >= date) {
+              this.MonthTableDataTwo[i][j].active = true;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * 将选择的 周 日期激活，让其显示为特定颜色
+   */
+  setWeekDateActive() {
+    for (let i = 0; i < this.showtableDataOne.length; i++) {
+      for (let j = 0; j < 7; j++) {
+        if (this.showtableDataOne[i][j].disable === false) {
+          this.showtableDataOne[i][j].active = false;
+          if (this.dateRange.length === 2) {
+            const date = moment({ y: this.dateNow.getFullYear(), M: this.dateNow.getMonth(), d: this.showtableDataOne[i][j].showDate });
+            if (moment(this.dateRange[0]).isoWeek() <= date.isoWeek() &&
+              moment(this.dateRange[1]).isoWeek() >= date.isoWeek()) {
+              this.showtableDataOne[i][j].active = true;
+            }
+          }
+        }
+      }
+    }
+    for (let i = 0; i < this.showtableDataTwo.length; i++) {
+      for (let j = 0; j < 7; j++) {
+        if (this.showtableDataTwo[i][j].disable === false) {
+          this.showtableDataTwo[i][j].active = false;
+          if (this.dateRange.length === 2) {
+            const date = moment({ y: this.dateNext.getFullYear(), M: this.dateNext.getMonth(), d: this.showtableDataTwo[i][j].showDate });
+            if (moment(this.dateRange[0]).isoWeek() <= date.isoWeek() &&
+              moment(this.dateRange[1]).isoWeek() >= date.isoWeek()) {
               this.showtableDataTwo[i][j].active = true;
             }
           }
@@ -242,6 +451,19 @@ export class DateRangePickerComponent implements OnInit {
     this.choose = choose;
     switch (this.choose) {
       case 'day':
+        this.dateRange = [];
+        this.updateTableData();
+        this.dateRangeShow = '';
+        this.isYearPickerShow = true;
+        this.isMonthPickerShow = true;
+        this.isMonthShow = true;
+        this.isDayTableShow = true;
+        this.isMonthTableShow = false;
+        break;
+      case 'week':
+        this.dateRange = [];
+        this.updateTableData();
+        this.dateRangeShow = '';
         this.isYearPickerShow = true;
         this.isMonthPickerShow = true;
         this.isMonthShow = true;
@@ -249,6 +471,9 @@ export class DateRangePickerComponent implements OnInit {
         this.isMonthTableShow = false;
         break;
       case 'month':
+        this.dateRange = [];
+        this.updateMonthTableData();
+        this.dateRangeShow = '';
         this.isYearPickerShow = true;
         this.isMonthPickerShow = false;
         this.isMonthShow = false;
@@ -256,8 +481,8 @@ export class DateRangePickerComponent implements OnInit {
         this.isMonthTableShow = true;
         this.dateNow.setFullYear(this.yearPicker);
         this.dateNext.setFullYear(this.yearPicker + 1);
-        this.MonthTableDataOne = this.service.getMonthTableData();
-        this.MonthTableDataTwo = this.service.getMonthTableData();
+        this.MonthTableDataOne = this.service.getMonthTableData(this.dateNow);
+        this.MonthTableDataTwo = this.service.getMonthTableData(this.dateNext);
         break;
 
     }
