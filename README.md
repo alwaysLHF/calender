@@ -6,7 +6,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 this is Angular component which can pick dateRange.  
 本angular组件为可以选择各种日期范围的日期选择器  
-![image](calender/show.gif)
+![image](https://github.com/alwaysLHF/calender/show.gif)
 
 ## Development server
 
