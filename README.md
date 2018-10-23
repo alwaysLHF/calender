@@ -2,6 +2,12 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.0.
 
+##describe  
+
+this is Angular component which can pick dateRange.  
+本angular组件为可以选择各种日期范围的日期选择器  
+![image](calender/show.gif)
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
