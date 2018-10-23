@@ -21,6 +21,7 @@
     position: absolute;
     display: block;
     z-index: 2;
+    background-color: white;
 }
 
 .ui-datepicker-wrapper-show {
@@ -171,4 +172,27 @@ td:hover {
 .ui-datepicker-month-tableTwo {
     margin-top: 7%;
     float: right;
+}
+
+.ui-datepicker-year-tableOne {
+    margin-top: 19%;
+    float: left;
+}
+
+.ui-datepicker-year-tableTwo {
+    margin-top: 19%;
+    float: right;
+}
+
+.select {
+    display: block;
+    margin: 12% 0 10% 16%;
+    width: 46px;
+    border: 1px solid rgb(245, 245, 245);
+    background: #1abc9c;
+    color: white;
+    transition: background-color .2s;
+    border-radius: 3px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { MONTH, ShowDateData } from './date-range-picker';
+import { MONTH, ShowDateData, ButtonClass } from './date-range-picker';
 import { DateRangePickerService } from './date-range-picker.service';
 import { SelectItem } from 'primeng/api';
 import * as moment from 'moment';
@@ -33,14 +33,31 @@ export class DateRangePickerComponent implements OnInit {
   isMonthShow = true;
   isDayTableShow = true;
   isMonthTableShow = false;
+  isHeaderShow = true; // 表头标签是否显示
+  isYearTableShow = false; // 选择年份是的选项
+  YEARSTART; // 年份开始日期
+  YEAREND; // 年份结束日期
+  yearProPicker: number = this.today.getFullYear(); // 用户选择的年份开始
+  yearNextPicker: number = this.today.getFullYear(); // 用户选择的年份结束
+  buttonClass = new ButtonClass(); // 用户选择按钮样式控制
+  isCalenderShow = false; // 日期选择面板是否显示
 
   constructor(private service: DateRangePickerService) {
     this.service.setDateRangeInput(this.maxDate, this.minDate);
     this.YEAR = this.service.getYearRange();
+    this.YEARSTART = this.YEAR;
+    this.YEAREND = this.YEAR;
   }
 
   ngOnInit() {
     this.updateTableData();
+  }
+
+  /**
+   * 是否显示控制面板
+   */
+  showCalenderShow() {
+    this.isCalenderShow ? this.isCalenderShow = false : this.isCalenderShow = true;
   }
 
   /**
@@ -80,6 +97,15 @@ export class DateRangePickerComponent implements OnInit {
           this.setDateActive();
         }
         break;
+      case 'week':
+        if (this.dateNow.getFullYear() >= this.YEAR[0].value) {
+          this.dateNow.setMonth(this.dateNow.getMonth() - 1);
+          this.yearPicker = this.dateNow.getFullYear();
+          this.monthPicker = this.dateNow.getMonth() + 1;
+          this.updateTableData();
+          this.setWeekDateActive();
+        }
+        break;
       case 'month':
         if (this.dateNow.getFullYear() > this.YEAR[0].value) {
           this.dateNow.setFullYear(this.dateNow.getFullYear() - 1);
@@ -103,6 +129,15 @@ export class DateRangePickerComponent implements OnInit {
           this.monthPicker = this.dateNow.getMonth() + 1;
           this.updateTableData();
           this.setDateActive();
+        }
+        break;
+      case 'week':
+        if (this.dateNext.getFullYear() <= this.YEAR[this.YEAR.length - 1].value) {
+          this.dateNow.setMonth(this.dateNow.getMonth() + 1);
+          this.yearPicker = this.dateNow.getFullYear();
+          this.monthPicker = this.dateNow.getMonth() + 1;
+          this.updateTableData();
+          this.setWeekDateActive();
         }
         break;
       case 'month':
@@ -341,7 +376,7 @@ export class DateRangePickerComponent implements OnInit {
               this.dateRangeShow = '';
           }
         }
-
+          break;
       }
     }
   }
@@ -459,6 +494,10 @@ export class DateRangePickerComponent implements OnInit {
         this.isMonthShow = true;
         this.isDayTableShow = true;
         this.isMonthTableShow = false;
+        this.isHeaderShow = true;
+        this.isYearTableShow = false;
+        this.buttonClass.initData();
+        this.buttonClass.dayClass = true;
         break;
       case 'week':
         this.dateRange = [];
@@ -469,6 +508,10 @@ export class DateRangePickerComponent implements OnInit {
         this.isMonthShow = true;
         this.isDayTableShow = true;
         this.isMonthTableShow = false;
+        this.isHeaderShow = true;
+        this.isYearTableShow = false;
+        this.buttonClass.initData();
+        this.buttonClass.weekClass = true;
         break;
       case 'month':
         this.dateRange = [];
@@ -479,12 +522,64 @@ export class DateRangePickerComponent implements OnInit {
         this.isMonthShow = false;
         this.isDayTableShow = false;
         this.isMonthTableShow = true;
+        this.isHeaderShow = true;
+        this.isYearTableShow = false;
         this.dateNow.setFullYear(this.yearPicker);
         this.dateNext.setFullYear(this.yearPicker + 1);
         this.MonthTableDataOne = this.service.getMonthTableData(this.dateNow);
         this.MonthTableDataTwo = this.service.getMonthTableData(this.dateNext);
+        this.buttonClass.initData();
+        this.buttonClass.monthClass = true;
         break;
-
+      case 'year':
+        this.dateRange = [];
+        this.dateRangeShow = '';
+        this.isYearPickerShow = false;
+        this.isMonthPickerShow = false;
+        this.isMonthShow = false;
+        this.isDayTableShow = false;
+        this.isMonthTableShow = false;
+        this.isHeaderShow = false;
+        this.isYearTableShow = true;
+        this.dateNow.setFullYear(this.yearPicker);
+        this.dateNext.setFullYear(this.yearPicker + 1);
+        this.buttonClass.initData();
+        this.buttonClass.yearClass = true;
+        this.dateRange = [this.today, this.today];
+        this.dateRangeShow = this.dateRange[0].getFullYear() + ' - ' + this.dateRange[1].getFullYear();
+        break;
     }
+  }
+
+  /**
+   * 通过获取当前选择的年份，缩减年份结束年份
+   */
+  getYearRangePro() {
+    const date = new Date(this.yearProPicker, 0, 1);
+    this.dateRange[0] = date;
+    if (this.yearProPicker > this.yearNextPicker) {
+      this.yearNextPicker = this.yearProPicker;
+      this.dateRange[1] = this.dateRange[0];
+    }
+    this.YEAREND = [];
+    for (let i = 0; i < this.YEAR.length; i++) {
+      if (this.YEAR[i].value >= this.yearProPicker) {
+        this.YEAREND.push(this.YEAR[i]);
+      }
+    }
+    this.dateRangeShow = this.dateRange[0].getFullYear() + ' - '
+      + this.dateRange[1].getFullYear();
+  }
+
+  /**
+   * 通过获取获取年份结束的选项，缩减年份开始的范围
+   */
+  getYearRangeNext() {
+    if (this.yearProPicker > this.yearNextPicker) {
+      this.yearNextPicker = this.yearProPicker;
+      const date = new Date(this.yearNextPicker, 0, 1);
+      this.dateRange[1] = date;
+    }
+    this.dateRangeShow = this.dateRange[0].getFullYear() + ' - ' + this.dateRange[1].getFullYear();
   }
 }

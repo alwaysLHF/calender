@@ -35,3 +35,20 @@ export class ShowDateData {
     month: number;
     showDate: number;
 }
+
+/**
+ * 用户选择按钮样式控制
+ */
+export class ButtonClass {
+    dayClass = false;
+    weekClass = false;
+    monthClass = false;
+    yearClass = false;
+
+    initData() {
+        this.dayClass = false;
+        this.weekClass = false;
+        this.monthClass = false;
+        this.yearClass = false;
+    }
+}

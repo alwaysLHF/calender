@@ -1,10 +1,10 @@
-<input type="text" class="datepicker" [(ngModel)]="dateRangeShow" readonly/>
-<div class="ui-datepicker-wrapper">
+<input type="text" class="datepicker" [(ngModel)]="dateRangeShow" readonly (click)='showCalenderShow()' />
+<div class="ui-datepicker-wrapper" *ngIf="isCalenderShow" tabindex="0" (blur)='showCalenderShow()'>
     <div class="ui-datepicker-range">
-        <button class="ui-datepicker-btn-range" (click)='rangeChoose("day")'>日</button>
-        <button class="ui-datepicker-btn-range" (click)='rangeChoose("week")'>周</button>
-        <button class="ui-datepicker-btn-range" (click)='rangeChoose("month")'>月</button>
-        <button class="ui-datepicker-btn-range">年</button>
+        <button [class.ui-datepicker-btn-range]='!buttonClass.dayClass' [class.select]='buttonClass.dayClass' (click)='rangeChoose("day")'>日</button>
+        <button [class.ui-datepicker-btn-range]='!buttonClass.weekClass' [class.select]='buttonClass.weekClass' (click)='rangeChoose("week")'>周</button>
+        <button [class.ui-datepicker-btn-range]='!buttonClass.monthClass' [class.select]='buttonClass.monthClass' (click)='rangeChoose("month")'>月</button>
+        <button [class.ui-datepicker-btn-range]='!buttonClass.yearClass' [class.select]='buttonClass.yearClass' (click)='rangeChoose("year")'>年</button>
     </div>
     <div class="ui-datepicker-date">
         <div class="ui-datepicker-datepicker">
@@ -13,7 +13,7 @@
             <label *ngIf="isMonthPickerShow" style="margin-left: 12px;" for="MONTH">月</label>
             <p-dropdown *ngIf="isMonthPickerShow" [options]="MONTH" [(ngModel)]="monthPicker" id="MONTH" (onClick)='getMonthPicker()'></p-dropdown>
         </div>
-        <div class="ui-datepicker-header">
+        <div class="ui-datepicker-header" *ngIf="isHeaderShow">
             <a class="ui-datepicker-btn ui-datepicker-prev-btn" href="#" (click)='getPrevDate()'>&lt;</a>
             <a class="ui-datepicker-btn ui-datepicker-next-btn" href="#" (click)='getNextDate()'>&gt;</a>
             <span class="ui-datepicker-month-one">{{dateNow.getFullYear()}}<span *ngIf="isMonthShow">/{{dateNow.getMonth() + 1}}</span></span>
@@ -74,20 +74,14 @@
                     </tbody>
                 </table>
             </div>
-            <div *ngIf="isWeekTableShow">
-                <table class="ui-datepicker-weektable ui-datepicker-week-tableOne">
-                    <tbody>
-                        <tr *ngFor="let row of WeekTableDataOne">
-                            <td [class.disable]='col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate1(col)">{{col.label}}</td>
-                        </tr>
-                    </tbody>
+            <div *ngIf="isYearTableShow">
+                <table class="ui-datepicker-monthtable ui-datepicker-year-tableOne">
+                    <div>起始年份</div>
+                    <p-dropdown [options]="YEARSTART" [(ngModel)]="yearProPicker" (onClick)='getYearRangePro()'></p-dropdown>
                 </table>
-                <table class="ui-datepicker-weektable ui-datepicker-week-tableTwo">
-                    <tbody>
-                        <tr *ngFor="let row of WeekTableDataTwo">
-                            <td [class.disable]='col.disable' [class.active]='col.active' *ngFor="let col of row" (click)="selectDate2(col)">{{col.label}}</td>
-                        </tr>
-                    </tbody>
+                <table class="ui-datepicker-monthtable ui-datepicker-year-tableTwo">
+                    <div>终止年份</div>
+                    <p-dropdown [options]="YEAREND" [(ngModel)]="yearNextPicker" (onClick)='getYearRangeNext()'></p-dropdown>
                 </table>
             </div>
         </div>
