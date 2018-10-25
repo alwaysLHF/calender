@@ -55,8 +55,8 @@ export class DateRangePickerComponent implements OnInit {
    * 是否显示控制面板
    */
   showCalenderShow() {
-    this.service.setDateRangeInput(this.maxDate, this.minDate);
-    this.YEAR = this.service.getYearRange();
+    this.service.setDateRangeInput(this.maxDate, this.minDate)
+    this.YEAR = this.service.getYearRange()
     this.YEARSTART = this.YEAR;
     this.YEAREND = this.YEAR;
     this.updateTableData();
