@@ -40,13 +40,13 @@ export class ShowDateData {
  * 用户选择按钮样式控制
  */
 export class ButtonClass {
-    dayClass = false;
+    dayClass = true;
     weekClass = false;
     monthClass = false;
     yearClass = false;
 
     initData() {
-        this.dayClass = false;
+        this.dayClass = true;
         this.weekClass = false;
         this.monthClass = false;
         this.yearClass = false;

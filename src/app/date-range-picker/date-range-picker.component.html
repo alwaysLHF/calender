@@ -1,10 +1,11 @@
 <input type="text" class="datepicker" [(ngModel)]="dateRangeShow" readonly (click)='showCalenderShow()' />
-<div class="ui-datepicker-wrapper" *ngIf="isCalenderShow" tabindex="0" (blur)='showCalenderShow()'>
+<div class="ui-datepicker-wrapper" *ngIf="isCalenderShow">
     <div class="ui-datepicker-range">
         <button [class.ui-datepicker-btn-range]='!buttonClass.dayClass' [class.select]='buttonClass.dayClass' (click)='rangeChoose("day")'>日</button>
         <button [class.ui-datepicker-btn-range]='!buttonClass.weekClass' [class.select]='buttonClass.weekClass' (click)='rangeChoose("week")'>周</button>
         <button [class.ui-datepicker-btn-range]='!buttonClass.monthClass' [class.select]='buttonClass.monthClass' (click)='rangeChoose("month")'>月</button>
         <button [class.ui-datepicker-btn-range]='!buttonClass.yearClass' [class.select]='buttonClass.yearClass' (click)='rangeChoose("year")'>年</button>
+        <button class='select' (click)='makesureRange()'>确定</button>
     </div>
     <div class="ui-datepicker-date">
         <div class="ui-datepicker-datepicker">

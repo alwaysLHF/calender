@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MONTH, ShowDateData, ButtonClass } from './date-range-picker';
 import { DateRangePickerService } from './date-range-picker.service';
 import { SelectItem } from 'primeng/api';
@@ -11,8 +11,10 @@ import * as moment from 'moment';
 })
 export class DateRangePickerComponent implements OnInit {
 
-  @Input() maxDate = new Date(2038, 3, 15); // 日期选择范围的最大值
-  @Input() minDate = new Date(2000, 5, 21); // 日期选择范围的最小值
+  @Input() maxDate = new Date(); // 日期选择范围的最大值
+  @Input() minDate = new Date(); // 日期选择范围的最小值
+
+  @Output() dateRangeSubmit = new EventEmitter<Date[]>();
 
   today: Date = new Date(); // 获取当日日期
   dateNow: Date = this.today; // 界面显示的日期
@@ -43,10 +45,6 @@ export class DateRangePickerComponent implements OnInit {
   isCalenderShow = false; // 日期选择面板是否显示
 
   constructor(private service: DateRangePickerService) {
-    this.service.setDateRangeInput(this.maxDate, this.minDate);
-    this.YEAR = this.service.getYearRange();
-    this.YEARSTART = this.YEAR;
-    this.YEAREND = this.YEAR;
   }
 
   ngOnInit() {
@@ -57,7 +55,20 @@ export class DateRangePickerComponent implements OnInit {
    * 是否显示控制面板
    */
   showCalenderShow() {
+    this.service.setDateRangeInput(this.maxDate, this.minDate);
+    this.YEAR = this.service.getYearRange();
+    this.YEARSTART = this.YEAR;
+    this.YEAREND = this.YEAR;
+    this.updateTableData();
     this.isCalenderShow ? this.isCalenderShow = false : this.isCalenderShow = true;
+  }
+
+  /**
+   * 将用户选择日期范围的提交
+   */
+  makesureRange() {
+    this.isCalenderShow = false;
+    this.dateRangeSubmit.emit(this.dateRange);
   }
 
   /**
