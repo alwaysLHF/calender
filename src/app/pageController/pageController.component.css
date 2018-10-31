@@ -1,0 +1,38 @@
+.jump-input-parent{
+    height: 30px;
+    display: inline-block;
+    line-height: 30px;
+    padding: 0 10px;
+    font-weight: 500;
+}
+/*跳转input输入框*/
+.jump-input{
+    width: 35px;
+    height: 21px;
+    text-align: center;
+    margin: 0 5px;
+}
+/*是否点击了该分页按钮*/
+.active{
+    color: #fff;
+    background: #2399e5;
+}
+/*跳转按钮*/
+.jump-btn{
+    width: 60px;
+    height: 23px;
+    text-align: center;
+    margin: 0 5px;
+}
+/*跳转按钮，pbtn里面的span*/
+:host /deep/ .jump-btn span.ui-button-text.ui-clickable{
+    line-height: 17px;
+}
+/*上一页，下一页，首页，尾页按钮*/
+/* .pagination .page-btn:active{
+    color: #fff!important;
+    background: #2399e5!important;
+}
+.pagination .page-btn:focus{
+    background: none!important;
+} */

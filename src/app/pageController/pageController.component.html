@@ -1,0 +1,57 @@
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <li class="jump-input-parent">
+            <a href="javascript:;">共{{pageNumTotal}}页，跳转至
+                <input class="jump-input" type="text" [(ngModel)]="jumpToPage">页
+                <button  class="jump-btn" pButton type="button" label="跳转" (click)='jumpToClick()'></button>
+            </a>
+        </li>
+        <!-- <li (click)="pageBtnEvent(1)">
+            <a class="page-btn" href="javascript:;" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li (click)="pageBtnEvent(2)">
+            <a class="page-btn" href="javascript:;">
+                <span aria-hidden="true">
+                    <</span>
+            </a>
+        </li> -->
+        <!-- <li (click)="pageClickEvent(pageShowNum.pageOne)">
+            <a href="javascript:;">{{pageShowNum.pageOne}}</a>
+        </li> -->
+        <li *ngFor="let page of pageShowNum" [class.active]="page.active" (click)="pageClickEvent(page)">
+            <a href="javascript:;">{{page.header}}</a>
+        </li>
+        <!-- <li (click)="pageClickEvent(pageShowNum.pageTwo)">
+            <a href="javascript:;">{{pageShowNlum.pageTwo}}</a>
+        </li>
+        <li (click)="pageClickEvent(pageShowNum.pageThree)">
+            <a href="javascript:;">{{pageShowNum.pageThree}}</a>
+        </li>
+        <li (click)="pageClickEvent(pageShowNum.pageFour)">
+            <a href="javascript:;">{{pageShowNum.pageFour}}</a>
+        </li>
+        <li (click)="pageClickEvent(pageShowNum.pageFive)">
+            <a href="javascript:;">{{pageShowNum.pageFive}}</a>
+        </li> -->
+        <!-- <li (click)="pageBtnEvent(3)">
+            <a class="page-btn" href="javascript:;">
+                <span aria-hidden="true">
+                    ></span>
+            </a>
+        </li>
+        <li (click)="pageBtnEvent(4)">
+            <a class="page-btn" href="javascript:;" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li> -->
+        <li>
+            <a href="javascript:;">
+                <select [(ngModel)]="pageSizeNow" (change)="selectPageSizeChange($event)">
+                    <option *ngFor="let pageS of pageSize" value="{{pageS}}">{{pageS}}</option>
+                </select>
+            </a>
+        </li>
+    </ul>
+</nav>
