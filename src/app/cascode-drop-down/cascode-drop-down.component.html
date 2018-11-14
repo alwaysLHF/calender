@@ -1,0 +1,9 @@
+<p>
+    cascode-drop-down works!
+</p>
+<h3 class="first">省</h3>
+<p-dropdown [options]="Shen" [(ngModel)]="selectedShen" placeholder="" (onClick)='chengeShenOpinion()' optionLabel="codeName" [showClear]="true"></p-dropdown>
+<h3 class="first">市</h3>
+<p-dropdown [options]="Shi" [(ngModel)]="selectedShi" placeholder="" (onClick)='getShiOpinion()' optionLabel="codeName" [showClear]="true"></p-dropdown>
+<h3 class="first">区</h3>
+<p-dropdown [options]="Qv" [(ngModel)]="selectedQv" placeholder="" (onClick)='getQvOpinion()' optionLabel="codeName" [showClear]="true"></p-dropdown>

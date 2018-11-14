@@ -7,6 +7,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 this is Angular component which can pick dateRange.  
 本angular组件为可以选择各种日期范围（日、周、月、年）的日期选择器  
 ![image](https://github.com/alwaysLHF/calender/blob/master/show.gif)
+级联组件：选择框级联演示  
+![image](https://github.com/alwaysLHF/calender/blob/master/cascode-drop-down.gif)
 
 ## Development server
 
