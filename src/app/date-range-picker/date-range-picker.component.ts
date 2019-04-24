@@ -14,7 +14,7 @@ export class DateRangePickerComponent implements OnInit {
   @Input() maxDate = new Date(); // 日期选择范围的最大值
   @Input() minDate = new Date(); // 日期选择范围的最小值
 
-  @Output() dateRangeSubmit = new EventEmitter<Date[]>();
+  @Output() dateRangeSubmit = new EventEmitter<any>();
 
   today: Date = new Date(); // 获取当日日期
   dateNow: Date = this.today; // 界面显示的日期
@@ -68,7 +68,89 @@ export class DateRangePickerComponent implements OnInit {
    */
   makesureRange() {
     this.isCalenderShow = false;
-    this.dateRangeSubmit.emit(this.dateRange);
+    this.dateRangeSubmit.emit(
+      {
+        dateRange: this.turnToDay(this.dateRange, this.choose),
+        timeUnit: this.choose
+      }
+    );
+  }
+
+  /**
+   * 将某一天转为条件下的第一天或最后一天
+   */
+  turnToDay(dateRange, timeUnit) {
+    switch (timeUnit) {
+      case 'day':
+        return this.dayTurnToDay(dateRange);
+      case 'week':
+        return this.weekTurnToDay(dateRange);
+      case 'month':
+        return this.monthTurnToDay(dateRange);
+      case 'year':
+        return this.yearTurnToDay(dateRange);
+    }
+  }
+
+  dayTurnToDay(dateRange) {
+    switch (dateRange.length) {
+      case 0:
+        return [];
+      case 1:
+        return [dateRange[0], dateRange[1]];
+      case 2:
+        return dateRange;
+    }
+  }
+
+  weekTurnToDay(dateRange) {
+    if (dateRange.length === 0) {
+      return [];
+    }
+    if (dateRange.length === 1) {
+      return [this.weeksFirstDay(dateRange[0]), this.weeksLastDay(dateRange[0])];
+    }
+    if (dateRange.length === 2) {
+      return [this.weeksFirstDay(dateRange[0]), this.weeksLastDay(dateRange[1])];
+    }
+  }
+
+  weeksFirstDay(date) {
+    return new Date(date - (date.getDay() - 1) * 86400000);
+  }
+
+  weeksLastDay(date) {
+    const WeekFirstDay = this.weeksFirstDay(date);
+    return new Date((WeekFirstDay.getTime() / 1000 + 6 * 86400) * 1000);
+  }
+
+  monthTurnToDay(dateRange) {
+    switch (dateRange.length) {
+      case 0:
+        return [];
+      case 1:
+        return [this.monthFirstDay(dateRange[0]), this.monthLastDay(dateRange[0])];
+      case 2:
+        return [this.monthFirstDay(dateRange[0]), this.monthLastDay(dateRange[1])];
+    }
+  }
+  monthFirstDay(date) {
+    return new Date(date.getYear(), date.getMonth(), 1);
+  }
+  monthLastDay(date) {
+    const MonthNextFirstDay = new Date(date.getYear(), date.getMonth() + 1, 1);
+    return new Date(MonthNextFirstDay.getTime() - 86400000);
+  }
+
+  yearTurnToDay(dateRange) {
+    switch (dateRange.length) {
+      case 0:
+        return [];
+      case 1:
+        return [new Date(dateRange[0].getFullYear(), 0, 1), new Date(dateRange[0].getFullYear(), 11, 31)];
+      case 2:
+        return [new Date(dateRange[0].getFullYear(), 0, 1), new Date(dateRange[1].getFullYear(), 11, 31)];
+    }
   }
 
   /**
@@ -523,6 +605,7 @@ export class DateRangePickerComponent implements OnInit {
         this.isYearTableShow = false;
         this.buttonClass.initData();
         this.buttonClass.weekClass = true;
+        this.buttonClass.dayClass = false;
         break;
       case 'month':
         this.dateRange = [];
@@ -541,6 +624,7 @@ export class DateRangePickerComponent implements OnInit {
         this.MonthTableDataTwo = this.service.getMonthTableData(this.dateNext);
         this.buttonClass.initData();
         this.buttonClass.monthClass = true;
+        this.buttonClass.dayClass = false;
         break;
       case 'year':
         this.dateRange = [];
@@ -557,6 +641,7 @@ export class DateRangePickerComponent implements OnInit {
         this.buttonClass.initData();
         this.buttonClass.yearClass = true;
         this.dateRange = [this.today, this.today];
+        this.buttonClass.dayClass = false;
         this.dateRangeShow = this.dateRange[0].getFullYear() + ' - ' + this.dateRange[1].getFullYear();
         break;
     }
