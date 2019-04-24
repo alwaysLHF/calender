@@ -112,7 +112,7 @@ export class DateRangePickerService {
     for (let i = 0; i < dateData.length; i++) {
       // tslint:disable-next-line:prefer-const
       let d = new ShowDateData();
-      const today = new Date(dateNow.getFullYear(), dateData[i].month, dateData[i].showDate);
+      const today = new Date(dateNow.getFullYear(), dateData[i].month - 1, dateData[i].showDate);
       if (dateData[i].month !== month || today > this.maxDate || today < this.minDate) {
         d.disable = true;
       } else {
